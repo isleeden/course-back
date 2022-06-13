@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { User } from 'src/schemas/users.schema';
-import { PaginationQuery } from 'src/types/pagination-query';
+import { User } from 'src/users/users.schema';
+import { getPaginationData } from 'src/types/get-pagination-data.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 
@@ -14,7 +14,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Query() paginationQuery: PaginationQuery) {
+  findAll(@Query() paginationQuery: getPaginationData) {
     return this.usersService.findAll(paginationQuery);
   }
 }

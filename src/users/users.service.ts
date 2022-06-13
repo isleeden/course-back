@@ -1,10 +1,10 @@
-import { UserDocument } from './../schemas/users.schema';
+import { UserDocument } from './users.schema';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from 'src/schemas/users.schema';
+import { User } from 'src/users/users.schema';
 import { CreateUserDto } from './dto/create-user.dto';
-import { PaginationQuery } from 'src/types/pagination-query';
+import { getPaginationData } from 'src/types/get-pagination-data.dto';
 import { paginationResult } from 'src/types/pagination-result';
 
 @Injectable()
@@ -21,15 +21,12 @@ export class UsersService {
   }
 
   async findAll(
-    paginationQuery: PaginationQuery,
+    paginationQuery: getPaginationData,
   ): Promise<paginationResult<User>> {
     const findQuery = this.userModel.find().skip(paginationQuery.offset);
-
     findQuery.limit(paginationQuery.limit);
-
     const results = await findQuery;
     const count = await this.userModel.count();
-
     return { results, count };
   }
 }
