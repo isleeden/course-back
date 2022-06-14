@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from './../users/users.schema';
 import { UsersService } from 'src/users/users.service';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Injectable()
@@ -11,11 +11,24 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async registration(userDto: CreateUserDto) {
-    const candidate = await this.usersService.findByName(userDto.name);
+  private async isCandidateExist(name: string) {
+    const candidate = await this.usersService.findByName(name);
     if (candidate) {
       throw new BadRequestException('user with this name is exist');
     }
+    return candidate;
+  }
+
+  private isLoginCorrect(user, passwordEquals) {
+    if (user && passwordEquals) {
+      return user;
+    } else {
+      throw new ForbiddenException('incorrect data');
+    }
+  }
+
+  async registration(userDto: CreateUserDto) {
+    await this.isCandidateExist(userDto.name);
     const hashPassword = await this.usersService.hashPassword(userDto.password);
     const user = await this.usersService.create({
       ...userDto,
@@ -24,8 +37,18 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  login(userDto: CreateUserDto) {
-    return `This action returns all auth`;
+  private async validateUser(userDto: CreateUserDto) {
+    const user = await this.usersService.findByName(userDto.name);
+    const passwordEquals = await this.usersService.comparePasswords(
+      userDto.password,
+      user.password,
+    );
+    return await this.isLoginCorrect(user, passwordEquals);
+  }
+
+  async login(userDto: CreateUserDto) {
+    const user = await this.validateUser(userDto);
+    return this.generateToken(user);
   }
 
   async generateToken(user: UserDocument) {
