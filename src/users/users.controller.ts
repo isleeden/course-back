@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { getPaginationData } from 'src/types/get-pagination-data.dto';
+
 import { UsersService } from './users.service';
 
 @Controller('users')

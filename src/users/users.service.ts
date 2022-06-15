@@ -21,6 +21,10 @@ export class UsersService {
     return this.userModel.findOne({ name }).exec();
   }
 
+  async updateUser(id: string | number, update) {
+    return this.userModel.findByIdAndUpdate(id, update);
+  }
+
   async hashPassword(password: string) {
     return await hash(password, 3);
   }

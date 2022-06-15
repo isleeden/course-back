@@ -1,8 +1,13 @@
 import { JwtService } from '@nestjs/jwt';
-import { User, UserDocument } from './../users/users.schema';
+import { UserDocument } from './../users/users.schema';
 import { UsersService } from 'src/users/users.service';
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import Roles from 'src/types/roles';
 
 @Injectable()
 export class AuthService {
@@ -27,9 +32,10 @@ export class AuthService {
     }
   }
 
-  async registration(userDto: CreateUserDto) {
+  async registration(userDto: CreateUserDto, isAdmin = false) {
     await this.isCandidateExist(userDto.name);
     const hashPassword = await this.usersService.hashPassword(userDto.password);
+    if (isAdmin) userDto.role = Roles.Admin;
     const user = await this.usersService.create({
       ...userDto,
       password: hashPassword,
@@ -52,7 +58,7 @@ export class AuthService {
   }
 
   async generateToken(user: UserDocument) {
-    const payload = { name: user.name, id: user._id };
+    const payload = { name: user.name, id: user._id, role: user.role };
     return {
       token: this.jwtService.sign(payload),
     };
