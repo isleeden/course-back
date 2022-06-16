@@ -1,3 +1,4 @@
+import { AuthModule } from 'src/auth/auth.module';
 import { FieldValue, FieldValueSchema } from './field-value/field-value.schema';
 import { Field, FieldSchema } from './field/field.schema';
 import { Module } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { Tag, TagSchema } from './tag/Tag.schema';
 import { TagService } from './tag/tag.service';
 import { ItemController } from './item/item.controller';
 import { ItemService } from './item/item.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ItemService } from './item/item.service';
     MongooseModule.forFeature([
       { name: FieldValue.name, schema: FieldValueSchema },
     ]),
+    AuthModule,
+    UsersModule
   ],
   providers: [CollectionService, TagService, ItemService],
   controllers: [CollectionController, ItemController],
