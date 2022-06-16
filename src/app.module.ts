@@ -5,7 +5,6 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { CollectionModule } from './collection/collection.module';
-import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -15,7 +14,6 @@ import { TagModule } from './tag/tag.module';
     AuthModule,
     AdminModule,
     CollectionModule,
-    TagModule,
   ],
   controllers: [],
   providers: [],

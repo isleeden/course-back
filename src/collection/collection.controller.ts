@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { getPaginationData } from 'src/types/get-pagination-data.dto';
 import { CollectionService } from './collection.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
-import { CreateItemDto } from './dto/create-item.dto';
+import { CreateItemDto } from './item/dto/create-item.dto';
 
 @Controller('collection')
 export class CollectionController {
@@ -16,10 +16,5 @@ export class CollectionController {
   @Get()
   getCollections(@Query() query: getPaginationData) {
     return this.collectionService.findAll(query);
-  }
-
-  @Post('/item')
-  addItem(@Body() itemDto: CreateItemDto) {
-    return this.collectionService.addItem(itemDto);
   }
 }

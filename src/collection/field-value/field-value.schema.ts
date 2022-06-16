@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Field } from './field.schema';
-import { Item } from './item.schema';
+import { Field } from '../field/field.schema';
+import { Item } from '../item/item.schema';
 
 export type FieldValueDocument = FieldValue & Document;
 

@@ -1,9 +1,9 @@
-import { FieldValue } from './field-value.schema';
+import { FieldValue } from '../field-value/field-value.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Tag } from 'src/tag/Tag.schema';
-import { Collection } from './collection.schema';
+import { Tag } from 'src/collection/tag/Tag.schema';
+import { Collection } from '../collection.schema';
 
 export type ItemDocument = Item & Document;
 
