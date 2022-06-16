@@ -18,9 +18,8 @@ export class AuthService {
 
   private async isCandidateExist(name: string) {
     const candidate = await this.usersService.findByName(name);
-    if (candidate) {
+    if (candidate)
       throw new BadRequestException('user with this name is exist');
-    }
     return candidate;
   }
 
@@ -45,6 +44,7 @@ export class AuthService {
 
   private async validateUser(userDto: CreateUserDto) {
     const user = await this.usersService.findByName(userDto.name);
+    if (user.blocked) throw new ForbiddenException();
     const passwordEquals = await this.usersService.comparePasswords(
       userDto.password,
       user.password,
