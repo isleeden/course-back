@@ -21,6 +21,7 @@ export class JwtAuthGuard implements CanActivate {
       const token = getHeaders(req);
       const user = this.jwtService.verify(token);
       if (user.blocked) throw new ForbiddenException();
+      req.user = user
       return true;
     } catch (e) {
       throw new UnauthorizedException();
