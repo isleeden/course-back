@@ -14,7 +14,7 @@ export class UsersService {
 
   async create(userDto: CreateUserDto): Promise<UserDocument> {
     const createdUser = new this.userModel(userDto);
-    return createdUser.save();
+    return await createdUser.save();
   }
 
   async findByName(name: string) {
@@ -22,7 +22,7 @@ export class UsersService {
   }
 
   async updateUser(id: string | number, update) {
-    return this.userModel.findByIdAndUpdate(id, update);
+    return await this.userModel.findByIdAndUpdate(id, update);
   }
 
   async hashPassword(password: string) {
