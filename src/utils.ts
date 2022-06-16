@@ -1,4 +1,4 @@
-import { FieldTypes } from './types/field-types';
+import FieldTypes from './types/field-types';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import moment from 'moment';

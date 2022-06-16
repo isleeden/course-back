@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { Collection } from './collection.schema';
-import { FieldTypes } from 'src/types/field-types';
+import FieldTypes from 'src/types/field-types';
 import { FieldValue } from './field-value.schema';
 
 export type FieldDocument = Field & Document;
@@ -27,7 +27,7 @@ export class Field {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Collection' })
   _collection: Collection;
 
-  @Prop({type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FieldValue' }]})
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FieldValue' }] })
   fieldValues: FieldValue[];
 }
 
