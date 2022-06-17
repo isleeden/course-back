@@ -16,11 +16,11 @@ export class CollectionService {
 
   async createCollection(collectionDto: CreateCollectionDto, request) {
     const userId = request.user.id;
-    const createdCollection = await this.collection.create({...collectionDto, user: userId});
-    await this.userService.findAndAddCollection(
-      userId,
-      createdCollection,
-    );
+    const createdCollection = await this.collection.create({
+      ...collectionDto,
+      user: userId,
+    });
+    await this.userService.findAndAddCollection(userId, createdCollection);
     return createdCollection;
   }
 
@@ -35,7 +35,10 @@ export class CollectionService {
   async findAll(query: getPaginationData) {
     const findQuery = this.collection.find().skip(query.offset);
     findQuery.limit(query.limit);
-    const results = await findQuery.populate('items');
+    const results = await findQuery.populate({
+      path: 'items',
+      populate: { path: 'tags' },
+    });
     const count = await this.collection.count();
     return { results, count };
   }
