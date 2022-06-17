@@ -1,4 +1,3 @@
-import { FieldValue } from './../field-value/field-value.schema';
 import { FieldValueService } from './../field-value/field-value.service';
 import { CreateFieldValueDto } from './../field-value/dto/create-field-value.dto';
 import { CreateItemDto } from './dto/create-item.dto';
@@ -10,6 +9,7 @@ import { Item, ItemDocument } from './item.schema';
 import { TagDocument } from '../tag/Tag.schema';
 import { CollectionService } from '../collection.service';
 import { FieldValueDocument } from '../field-value/field-value.schema';
+import { RemoveTagDto } from './dto/remove-tag.dto';
 
 @Injectable()
 export class ItemService {
@@ -44,6 +44,12 @@ export class ItemService {
       { $push: { fieldValues: fieldValue._id } },
       { new: true, useFindAndModify: false },
     );
+  }
+
+  async removeTag(removeTagDto: RemoveTagDto) {
+    return await this.item.findByIdAndUpdate(removeTagDto.id, {
+      $pull: { tags: removeTagDto.tag_id },
+    });
   }
 
   async addTagToItem(tag: TagDocument, item: ItemDocument) {
