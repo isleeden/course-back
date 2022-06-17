@@ -12,25 +12,3 @@ export const getHeaders = (req: Request) => {
   }
   return token;
 };
-
-export const validateField = (type: FieldTypes, value: any) => {
-  switch (type) {
-    case FieldTypes.Text:
-      if (typeof value === 'string') return;
-      else throw new BadRequestException();
-    case FieldTypes.Number:
-      if (!isNaN(value)) return;
-      else throw new BadRequestException();
-    case FieldTypes.Bigtext:
-      if (typeof value === 'string') return;
-      else throw new BadRequestException();
-    case FieldTypes.Boolean:
-      if (typeof value === 'boolean') return;
-      else throw new BadRequestException();
-    case FieldTypes.Date:
-      if (moment(value).isValid()) return;
-      else throw new BadRequestException();
-    default:
-      break;
-  }
-};

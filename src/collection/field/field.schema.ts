@@ -22,9 +22,9 @@ export class Field {
       FieldTypes.Number,
     ],
   })
-  type: string;
+  type: FieldTypes;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Collection' })
+  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Collection' })
   _collection: Collection;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FieldValue' }] })

@@ -8,6 +8,9 @@ export type CollectionDocument = Collection & Document;
 
 @Schema()
 export class Collection {
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  _id: mongoose.Schema.Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 
