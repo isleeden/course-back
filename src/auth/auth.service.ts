@@ -16,21 +16,6 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  private async isCandidateExist(name: string) {
-    const candidate = await this.usersService.findByName(name);
-    if (candidate)
-      throw new BadRequestException('user with this name is exist');
-    return candidate;
-  }
-
-  private isLoginCorrect(user, passwordEquals) {
-    if (user && passwordEquals) {
-      return user;
-    } else {
-      throw new ForbiddenException('incorrect data');
-    }
-  }
-
   async registration(userDto: CreateUserDto, isAdmin = false) {
     await this.isCandidateExist(userDto.name);
     const hashPassword = await this.usersService.hashPassword(userDto.password);
@@ -39,7 +24,14 @@ export class AuthService {
       ...userDto,
       password: hashPassword,
     });
-    return this.generateToken(user);
+    const token = this.generateToken(user);
+    return { token, user };
+  }
+
+  async login(userDto: CreateUserDto) {
+    const user = await this.validateUser(userDto);
+    const token = this.generateToken(user);
+    return { token, user };
   }
 
   private async validateUser(userDto: CreateUserDto) {
@@ -52,15 +44,25 @@ export class AuthService {
     return await this.isLoginCorrect(user, passwordEquals);
   }
 
-  async login(userDto: CreateUserDto) {
-    const user = await this.validateUser(userDto);
-    return this.generateToken(user);
-  }
-
-  async generateToken(user: UserDocument) {
+  private async generateToken(user: UserDocument) {
     const payload = { name: user.name, id: user._id, role: user.role };
     return {
       token: this.jwtService.sign(payload),
     };
+  }
+
+  private async isCandidateExist(name: string) {
+    const candidate = await this.usersService.findByName(name);
+    if (candidate)
+      throw new BadRequestException('user with this name is exist');
+    return candidate;
+  }
+
+  private isLoginCorrect(user: UserDocument, passwordEquals: boolean) {
+    if (user && passwordEquals) {
+      return user;
+    } else {
+      throw new ForbiddenException('incorrect data');
+    }
   }
 }
