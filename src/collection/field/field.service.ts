@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FieldValueDocument } from '../field-value/field-value.schema';
-import { CreateFieldDto } from './dto/create-field.dto';
+import { CreateFieldDto, UpdateFieldDto } from './dto/create-field.dto';
 
 import { Field, FieldDocument } from './field.schema';
 
@@ -10,11 +10,18 @@ import { Field, FieldDocument } from './field.schema';
 export class FieldService {
   constructor(@InjectModel(Field.name) private field: Model<FieldDocument>) {}
 
-  async addField(fieldDto: CreateFieldDto) {
+  async create(fieldDto: CreateFieldDto) {
     return await this.field.create({
       name: fieldDto.name,
       type: fieldDto.type,
       _collection: fieldDto.collection_id,
+    });
+  }
+
+  async update(fieldDto: UpdateFieldDto) {
+    return await this.field.findByIdAndUpdate(fieldDto.id, {
+      name: fieldDto.name,
+      type: fieldDto.type,
     });
   }
 

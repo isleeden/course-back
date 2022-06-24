@@ -10,6 +10,7 @@ import { TagDocument } from '../tag/Tag.schema';
 import { CollectionService } from '../collection.service';
 import { FieldValueDocument } from '../field-value/field-value.schema';
 import { RemoveTagDto } from './dto/remove-tag.dto';
+import { getPaginationData } from 'src/types/get-data.dto';
 
 @Injectable()
 export class ItemService {
@@ -58,6 +59,17 @@ export class ItemService {
       { $push: { tags: tag._id } },
       { new: true, useFindAndModify: false },
     );
+  }
+
+  async getItems(query: getPaginationData) {
+    const findQuery = this.item.find().skip(query.offset).sort(query.sort);
+    findQuery.limit(query.limit);
+    const results = await findQuery.populate({
+      path: '_collection',
+      populate: { path: 'user' },
+    });
+    const count = await this.item.count();
+    return { results, count };
   }
 
   private async bindFieldValues(

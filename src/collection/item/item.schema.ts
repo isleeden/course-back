@@ -7,7 +7,7 @@ import { Collection } from '../collection.schema';
 
 export type ItemDocument = Item & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Item {
   @Prop({ required: true })
   name: string;

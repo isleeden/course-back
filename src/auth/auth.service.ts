@@ -5,6 +5,7 @@ import {
   Injectable,
   BadRequestException,
   ForbiddenException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import Roles from 'src/types/roles';
@@ -34,21 +35,36 @@ export class AuthService {
     return { token, user };
   }
 
+  async refreshToken(token: string) {
+    try {
+      const userToken = this.jwtService.verify(token);
+      const user = await this.usersService.findById(userToken.id);
+      const newToken = this.generateToken(user);
+      return { user, token: newToken };
+    } catch {
+      throw new UnauthorizedException('token expired or invalid');
+    }
+  }
+
   private async validateUser(userDto: CreateUserDto) {
     const user = await this.usersService.findByName(userDto.name);
+    if (!user) throw new BadRequestException();
     if (user.blocked) throw new ForbiddenException();
     const passwordEquals = await this.usersService.comparePasswords(
       userDto.password,
       user.password,
     );
-    return await this.isLoginCorrect(user, passwordEquals);
+    return this.isLoginCorrect(user, passwordEquals);
   }
 
-  private async generateToken(user: UserDocument) {
-    const payload = { name: user.name, id: user._id, role: user.role };
-    return {
-      token: this.jwtService.sign(payload),
+  private generateToken(user: UserDocument) {
+    const payload = {
+      name: user.name,
+      id: user._id,
+      role: user.role,
+      blocked: user.blocked,
     };
+    return this.jwtService.sign(payload);
   }
 
   private async isCandidateExist(name: string) {

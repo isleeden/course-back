@@ -1,3 +1,4 @@
+import { Field } from './field/field.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
@@ -6,9 +7,9 @@ import { User } from 'src/users/users.schema';
 
 export type CollectionDocument = Collection & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Collection {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, auto: true })
   _id: mongoose.Schema.Types.ObjectId;
 
   @Prop({ required: true })
@@ -20,8 +21,8 @@ export class Collection {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 
-  @Prop({ required: true, default: [] })
-  fields: [];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Field' }] })
+  fields: Field[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }] })
   items: Item[];

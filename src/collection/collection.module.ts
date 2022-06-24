@@ -13,7 +13,6 @@ import { ItemController } from './item/item.controller';
 import { ItemService } from './item/item.service';
 import { UsersModule } from 'src/users/users.module';
 import { FieldService } from './field/field.service';
-import { FieldController } from './field/field.controller';
 import { FieldValueService } from './field-value/field-value.service';
 
 @Module({
@@ -37,6 +36,6 @@ import { FieldValueService } from './field-value/field-value.service';
     ItemService,
     FieldService,
   ],
-  controllers: [CollectionController, ItemController, FieldController],
+  controllers: [CollectionController, ItemController],
 })
 export class CollectionModule {}

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch, Post, Put, Query } from '@nestjs/common';
-import { getPaginationData } from 'src/types/get-pagination-data.dto';
+import { getPaginationData } from 'src/types/get-data.dto';
 import { CreateItemDto } from './dto/create-item.dto';
 import { RemoveTagDto } from './dto/remove-tag.dto';
 import { ItemService } from './item.service';
@@ -18,8 +18,13 @@ export class ItemController {
     return this.itemService.addItem(itemDto);
   }
 
-  @Patch("/remove_tag")
+  @Patch('/remove_tag')
   removeTag(@Body() removeTagDto: RemoveTagDto) {
     return this.itemService.removeTag(removeTagDto);
+  }
+
+  @Get()
+  getItems(@Query() query: getPaginationData) {
+    return this.itemService.getItems(query);
   }
 }

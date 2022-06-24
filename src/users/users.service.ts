@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Collection } from 'mongoose';
 import { User } from 'src/users/users.schema';
 import { CreateUserDto } from './dto/create-user.dto';
-import { getPaginationData } from 'src/types/get-pagination-data.dto';
+import { getPaginationData } from 'src/types/get-data.dto';
 import { paginationResult } from 'src/types/pagination-result';
 import { hash, compare } from 'bcrypt';
 import { CollectionDocument } from 'src/collection/collection.schema';
@@ -19,7 +19,11 @@ export class UsersService {
   }
 
   async findByName(name: string) {
-    return this.user.findOne({ name }).exec();
+    return await this.user.findOne({ name }).exec();
+  }
+
+  async findById(id: string) {
+    return await this.user.findById(id);
   }
 
   async updateUser(id: string | number, update) {
@@ -38,7 +42,10 @@ export class UsersService {
     );
   }
 
-  async comparePasswords(password: string, hashedPassword: string) {
+  async comparePasswords(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return await compare(password, hashedPassword);
   }
 
