@@ -1,3 +1,4 @@
+import { TagController } from './tag/tag.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { FieldValue, FieldValueSchema } from './field-value/field-value.schema';
 import { Field, FieldSchema } from './field/field.schema';
@@ -36,6 +37,6 @@ import { FieldValueService } from './field-value/field-value.service';
     ItemService,
     FieldService,
   ],
-  controllers: [CollectionController, ItemController],
+  controllers: [CollectionController, ItemController, TagController],
 })
 export class CollectionModule {}

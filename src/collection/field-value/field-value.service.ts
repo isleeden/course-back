@@ -6,7 +6,6 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import moment from 'moment';
 import { Model } from 'mongoose';
 import FieldTypes from 'src/types/field-types';
 import { FieldService } from '../field/field.service';
@@ -85,7 +84,7 @@ export class FieldValueService {
         if (typeof value === 'boolean') return;
         else throw new BadRequestException();
       case FieldTypes.Date:
-        if (moment(value).isValid()) return;
+        if (new Date(value).getTime() > 0) return;
         else throw new BadRequestException();
       default:
         break;

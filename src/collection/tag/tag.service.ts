@@ -9,6 +9,12 @@ import { Tag, TagDocument } from './Tag.schema';
 export class TagService {
   constructor(@InjectModel(Tag.name) private tag: Model<TagDocument>) {}
 
+  async findTagBySubstring(substring) {
+    return await this.tag
+      .find({ name: { $regex: substring, $options: 'i' } })
+      .limit(10);
+  }
+
   async findOrCreate(tagDto: CreateTagDto) {
     return (
       (await this.tag.findOne({ name: tagDto.name })) ||

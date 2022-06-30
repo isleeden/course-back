@@ -13,7 +13,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { ItemDocument } from './item/item.schema';
-import { removeCollectionsDto } from './dto/remove-collection.dto';
 
 @Injectable()
 export class CollectionService {
@@ -82,11 +81,14 @@ export class CollectionService {
   }
 
   async findById(id: string) {
-    return await this.collection.findById(id).populate('fields');
+    return await this.collection
+      .findById(id)
+      .populate('fields')
+      .populate('user');
   }
 
-  async remove(query: removeCollectionsDto) {
-    return await this.collection.deleteOne({ id: query.id });
+  async remove(id: string) {
+    return await this.collection.findByIdAndDelete(id);
   }
 
   private async addFieldsToCollection(
@@ -94,7 +96,7 @@ export class CollectionService {
     fields: CollectionField[],
   ) {
     for (const field of fields) {
-      const createdOrUpdated = field.id
+      const createdOrUpdated = field._id
         ? await this.updateField(field)
         : await this.createField(field, collectionId);
       await this.addFieldToCollection(createdOrUpdated, collectionId);
@@ -122,7 +124,7 @@ export class CollectionService {
 
   private async updateField(field: CollectionField) {
     return await this.fieldService.update({
-      id: field.id,
+      id: field._id,
       type: field.type,
       name: field.name,
     });

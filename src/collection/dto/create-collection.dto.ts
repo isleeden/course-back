@@ -12,7 +12,7 @@ export class EditCollectionDto extends CreateCollectionDto {
 }
 
 export type CollectionField = {
-  id: string | undefined;
+  _id: string | undefined;
   name: string;
   type: FieldTypes;
 };

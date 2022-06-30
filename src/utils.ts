@@ -1,7 +1,7 @@
-import FieldTypes from './types/field-types';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { getPaginationData } from 'src/types/get-data.dto';
+import { UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
-import moment from 'moment';
+import { Model } from 'mongoose';
 
 export const getHeaders = (req: Request) => {
   const authHeader = req.headers.authorization;
@@ -12,3 +12,17 @@ export const getHeaders = (req: Request) => {
   }
   return token;
 };
+
+export async function paginationQuery<T>(
+  model: Model<T>,
+  options: { where: any; query: getPaginationData },
+) {
+  const { where, query } = options;
+  const findQuery = model
+    .find(where)
+    .skip(query.offset)
+    .sort(query.sort)
+    .limit(query.limit);
+  const count = await model.where(where).count();
+  return { findQuery, count };
+}

@@ -10,4 +10,3 @@ export class getByUserIdPaginationData {
   readonly offset: 0;
   readonly sort: any;
 }
-

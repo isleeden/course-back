@@ -11,6 +11,7 @@ import { CollectionService } from '../collection.service';
 import { FieldValueDocument } from '../field-value/field-value.schema';
 import { RemoveTagDto } from './dto/remove-tag.dto';
 import { getPaginationData } from 'src/types/get-data.dto';
+import { paginationQuery } from 'src/utils';
 
 @Injectable()
 export class ItemService {
@@ -33,6 +34,22 @@ export class ItemService {
       createdItem,
     );
     return await this.item.findById(createdItem._id);
+  }
+
+  async update(id: string, itemDto: CreateItemDto) {
+    const updatedItem = await this.item.findByIdAndUpdate(id, {
+      name: itemDto.name,
+      _collection: itemDto.collection_id,
+      fields: [],
+      tags: [],
+    });
+    await this.bindFieldValues(itemDto.fieldValues, updatedItem);
+    await this.bindTags(itemDto.tags, updatedItem);
+    return updatedItem;
+  }
+
+  async remove(id: string) {
+    return await this.item.findByIdAndDelete(id);
   }
 
   async findById(id: string) {
@@ -61,15 +78,24 @@ export class ItemService {
     );
   }
 
-  async getItems(query: getPaginationData) {
-    const findQuery = this.item.find().skip(query.offset).sort(query.sort);
-    findQuery.limit(query.limit);
-    const results = await findQuery.populate({
-      path: '_collection',
-      populate: { path: 'user' },
+  async findCollectionItems(id: string, query: getPaginationData) {
+    const { findQuery, count } = await paginationQuery<Item>(this.item, {
+      where: { _collection: id },
+      query,
     });
-    const count = await this.item.count();
+    const results = await findQuery.populate('fieldValues').populate('tags');
     return { results, count };
+  }
+
+  async findItem(id: string) {
+    return await this.item
+      .findById(id)
+      .populate('fieldValues')
+      .populate('tags')
+      .populate({
+        path: '_collection',
+        populate: [{ path: 'fields' }, { path: 'user' }],
+      });
   }
 
   private async bindFieldValues(
@@ -82,10 +108,21 @@ export class ItemService {
   }
 
   private async bindTags(tags: string[], item: ItemDocument) {
-    for (const tag of tags) {
+    const uniqueTags = this.getUniqueTags(tags);
+    for (const tag of uniqueTags) {
       const findedTag = await this.tagService.findOrCreate({ name: tag });
       await this.addTagToItem(findedTag, item);
       await this.tagService.addItemToTag(item, findedTag._id);
     }
+  }
+
+  private getUniqueTags(tags: string[]) {
+    const uniqueTags = [];
+    tags.forEach((element) => {
+      if (!uniqueTags.includes(element)) {
+        uniqueTags.push(element.trim());
+      }
+    });
+    return uniqueTags;
   }
 }

@@ -18,7 +18,6 @@ import {
   CreateCollectionDto,
   EditCollectionDto,
 } from './dto/create-collection.dto';
-import { removeCollectionsDto } from './dto/remove-collection.dto';
 
 @Controller('collection')
 export class CollectionController {
@@ -50,8 +49,8 @@ export class CollectionController {
     return this.collectionService.findById(params.id);
   }
 
-  @Delete()
-  removeCollections(@Query() query: removeCollectionsDto) {
-    return this.collectionService.remove(query);
+  @Delete(':id')
+  removeCollections(@Param() params) {
+    return this.collectionService.remove(params.id);
   }
 }

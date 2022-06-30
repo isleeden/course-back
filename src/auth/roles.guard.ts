@@ -20,7 +20,7 @@ export class RolesGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     try {
       const requiredRole = this.reflector.get(ROLES_KEY, context.getHandler());
-      if (!requiredRole && requiredRole !== 0) return true;
+      if (!requiredRole && requiredRole !== "") return true;
       const token = getHeaders(req);
       const user = this.jwtService.verify(token);
       if (user.blocked) throw new ForbiddenException();

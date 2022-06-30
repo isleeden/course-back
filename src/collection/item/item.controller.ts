@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Patch, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { CreateItemDto } from './dto/create-item.dto';
 import { RemoveTagDto } from './dto/remove-tag.dto';
@@ -13,9 +23,9 @@ export class ItemController {
     return this.itemService.addItem(itemDto);
   }
 
-  @Put()
-  updateItem(@Body() itemDto: CreateItemDto) {
-    return this.itemService.addItem(itemDto);
+  @Put('/:id')
+  updateItem(@Param() params, @Body() itemDto: CreateItemDto) {
+    return this.itemService.update(params.id, itemDto);
   }
 
   @Patch('/remove_tag')
@@ -23,8 +33,18 @@ export class ItemController {
     return this.itemService.removeTag(removeTagDto);
   }
 
-  @Get()
-  getItems(@Query() query: getPaginationData) {
-    return this.itemService.getItems(query);
+  @Get('/:id')
+  getItem(@Param() params) {
+    return this.itemService.findItem(params.id);
+  }
+
+  @Get('/collection/:id')
+  getItems(@Param() params, @Query() query: getPaginationData) {
+    return this.itemService.findCollectionItems(params.id, query);
+  }
+
+  @Delete(':id')
+  removeItem(@Param() params) {
+    return this.itemService.remove(params.id);
   }
 }

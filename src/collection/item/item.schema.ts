@@ -18,7 +18,9 @@ export class Item {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FieldValue' }] })
   fieldValues: FieldValue[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }] })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag', unique: true }],
+  })
   tags: Tag[];
 }
 
