@@ -16,7 +16,6 @@ export class User {
 
   @Prop({
     required: true,
-    unique: true,
     enum: [Roles.Admin, Roles.User],
     default: Roles.User,
   })

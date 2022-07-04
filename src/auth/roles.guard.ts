@@ -19,12 +19,12 @@ export class RolesGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = context.switchToHttp().getRequest();
     try {
-      const requiredRole = this.reflector.get(ROLES_KEY, context.getHandler());
-      if (!requiredRole && requiredRole !== "") return true;
       const token = getHeaders(req);
       const user = this.jwtService.verify(token);
+      const requiredRole = this.reflector.get(ROLES_KEY, context.getHandler());
       if (user.blocked) throw new ForbiddenException();
-      req.user = user
+      req.user = user;
+      if (!requiredRole && requiredRole !== '') return true;
       return user.role == requiredRole;
     } catch (e) {
       throw new ForbiddenException();

@@ -8,7 +8,7 @@ import { CollectionController } from './collection.controller';
 import { Collection, CollectionSchema } from './collection.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Item, ItemSchema } from './item/item.schema';
-import { Tag, TagSchema } from './tag/Tag.schema';
+import { Tag, TagSchema } from './tag/tag.schema';
 import { TagService } from './tag/tag.service';
 import { ItemController } from './item/item.controller';
 import { ItemService } from './item/item.service';

@@ -15,14 +15,36 @@ export const getHeaders = (req: Request) => {
 
 export async function paginationQuery<T>(
   model: Model<T>,
-  options: { where: any; query: getPaginationData },
+  options: { query: getPaginationData },
 ) {
-  const { where, query } = options;
+  const { query } = options;
+  const where = JSON.parse(query.where);
   const findQuery = model
     .find(where)
     .skip(query.offset)
-    .sort(query.sort)
+    .sort(JSON.parse(query.sort))
     .limit(query.limit);
   const count = await model.where(where).count();
   return { findQuery, count };
+}
+
+export async function aggregateByLength<T>(
+  model: Model<T>,
+  options: {
+    query: getPaginationData;
+    sortBy: 1 | -1 | 'asc' | 'desc' | 'ascending' | 'descending';
+    sortField: string;
+  },
+) {
+  const { query } = options;
+  const where = JSON.parse(query.where);
+  const results = model
+    .aggregate()
+    .match(where)
+    .addFields({ length: { $size: options.sortField } })
+    .sort({ ...JSON.parse(query.sort), length: options.sortBy })
+    .skip(Number(query.offset))
+    .limit(Number(query.limit));
+  const count = await model.where(where).count();
+  return { results, count };
 }

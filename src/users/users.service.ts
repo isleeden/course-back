@@ -1,3 +1,4 @@
+import { paginationQuery } from 'src/utils';
 import { UserDocument } from './users.schema';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -50,10 +51,10 @@ export class UsersService {
   }
 
   async findAll(query: getPaginationData): Promise<paginationResult<User>> {
-    const findQuery = this.user.find().skip(query.offset);
-    findQuery.limit(query.limit);
-    const results = await findQuery;
-    const count = await this.user.count();
+    const { findQuery, count } = await paginationQuery<User>(this.user, {
+      query,
+    });
+    const results = await findQuery.exec();
     return { results, count };
   }
 }

@@ -1,4 +1,3 @@
-import { getByUserIdPaginationData } from '../types/get-data.dto';
 import {
   Body,
   Controller,
@@ -11,32 +10,32 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { CollectionService } from './collection.service';
 import {
   CreateCollectionDto,
   EditCollectionDto,
 } from './dto/create-collection.dto';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('collection')
 export class CollectionController {
   constructor(private collectionService: CollectionService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
   @Post()
   createCollection(@Body() collectionDto: CreateCollectionDto, @Req() request) {
     return this.collectionService.createCollection(collectionDto, request);
   }
 
-  @Get('user')
-  getUserCollections(@Query() query: getByUserIdPaginationData) {
-    return this.collectionService.findByUserId(query);
-  }
-
   @Get()
   getCollections(@Query() query: getPaginationData) {
     return this.collectionService.findAll(query);
+  }
+
+  @Get('/mostitems')
+  getMostItemsCollections(@Query() query: getPaginationData) {
+    return this.collectionService.findMostItems(query);
   }
 
   @Put(':id')

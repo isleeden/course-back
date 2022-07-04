@@ -18,6 +18,16 @@ import { ItemService } from './item.service';
 export class ItemController {
   constructor(private itemService: ItemService) {}
 
+  @Get()
+  getItems(@Query() query: getPaginationData) {
+    return this.itemService.findItems(query);
+  }
+
+  @Get('/:id')
+  getItem(@Param() params) {
+    return this.itemService.findItem(params.id);
+  }
+
   @Post()
   addItem(@Body() itemDto: CreateItemDto) {
     return this.itemService.addItem(itemDto);
@@ -31,16 +41,6 @@ export class ItemController {
   @Patch('/remove_tag')
   removeTag(@Body() removeTagDto: RemoveTagDto) {
     return this.itemService.removeTag(removeTagDto);
-  }
-
-  @Get('/:id')
-  getItem(@Param() params) {
-    return this.itemService.findItem(params.id);
-  }
-
-  @Get('/collection/:id')
-  getItems(@Param() params, @Query() query: getPaginationData) {
-    return this.itemService.findCollectionItems(params.id, query);
   }
 
   @Delete(':id')

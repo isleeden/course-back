@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TagService } from 'src/collection/tag/tag.service';
 import { Item, ItemDocument } from './item.schema';
-import { TagDocument } from '../tag/Tag.schema';
+import { TagDocument } from '../tag/tag.schema';
 import { CollectionService } from '../collection.service';
 import { FieldValueDocument } from '../field-value/field-value.schema';
 import { RemoveTagDto } from './dto/remove-tag.dto';
@@ -78,9 +78,8 @@ export class ItemService {
     );
   }
 
-  async findCollectionItems(id: string, query: getPaginationData) {
+  async findItems(query: getPaginationData) {
     const { findQuery, count } = await paginationQuery<Item>(this.item, {
-      where: { _collection: id },
       query,
     });
     const results = await findQuery.populate('fieldValues').populate('tags');

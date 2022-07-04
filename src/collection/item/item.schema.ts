@@ -2,7 +2,7 @@ import { FieldValue } from '../field-value/field-value.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Tag } from 'src/collection/tag/Tag.schema';
+import { Tag } from 'src/collection/tag/tag.schema';
 import { Collection } from '../collection.schema';
 
 export type ItemDocument = Item & Document;
@@ -19,7 +19,7 @@ export class Item {
   fieldValues: FieldValue[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag', unique: true }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
   })
   tags: Tag[];
 }

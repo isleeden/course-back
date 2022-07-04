@@ -13,6 +13,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { ItemDocument } from './item/item.schema';
+import { aggregateByLength, paginationQuery } from 'src/utils';
+import { MostItemsDto } from './item/dto/most-items.dto';
 
 @Injectable()
 export class CollectionService {
@@ -47,14 +49,28 @@ export class CollectionService {
   }
 
   async findAll(query: getPaginationData) {
-    const findQuery = this.collection.find().skip(query.offset);
-    findQuery.limit(query.limit);
-    const results = await findQuery.populate({
-      path: 'items',
-      populate: { path: 'tags' },
-    });
-    const count = await this.collection.count();
+    const { findQuery, count } = await paginationQuery<Collection>(
+      this.collection,
+      { query },
+    );
+    const results = await findQuery.populate([{ path: 'user' }]);
     return { results, count };
+  }
+
+  async findMostItems(query: getPaginationData) {
+    const { results } = await aggregateByLength<Collection>(this.collection, {
+      query,
+      sortBy: -1,
+      sortField: '$items',
+    });
+    return await results
+      .lookup({
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      })
+      .unwind({ path: '$user', preserveNullAndEmptyArrays: true });
   }
 
   async update(id: string, collectionDto: EditCollectionDto) {
@@ -69,15 +85,6 @@ export class CollectionService {
       collectionDto.fields,
     );
     return createdCollection;
-  }
-
-  async findByUserId(query: getByUserIdPaginationData) {
-    const findQuery = this.collection
-      .find({ user: query.user_id })
-      .skip(query.offset);
-    const results = await findQuery.limit(query.limit).populate('user');
-    const count = await this.collection.count();
-    return { results, count };
   }
 
   async findById(id: string) {
