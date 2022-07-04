@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FieldValueDocument } from '../field-value/field-value.schema';
+import { FieldValueDocument } from 'src/field-value/field-value.schema';
 import { CreateFieldDto, UpdateFieldDto } from './dto/create-field.dto';
-
 import { Field, FieldDocument } from './field.schema';
 
 @Injectable()

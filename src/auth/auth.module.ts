@@ -6,7 +6,7 @@ import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule),
+    UsersModule,
     JwtModule.register({
       secret: process.env.PRIVATE_KEY || 'secret',
       signOptions: {

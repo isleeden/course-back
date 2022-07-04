@@ -1,8 +1,8 @@
-import { Field } from './field/field.schema';
+import { Field } from '../field/field.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Item } from './item/item.schema';
+import { Item } from '../item/item.schema';
 import { User } from 'src/users/users.schema';
 
 export type CollectionDocument = Collection & Document;

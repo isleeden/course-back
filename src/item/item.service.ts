@@ -1,25 +1,26 @@
-import { FieldValueService } from './../field-value/field-value.service';
-import { CreateFieldValueDto } from './../field-value/dto/create-field-value.dto';
+import { CreateFieldValueDto } from '../field-value/dto/create-field-value.dto';
 import { CreateItemDto } from './dto/create-item.dto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { TagService } from 'src/collection/tag/tag.service';
+import { TagService } from 'src/tag/tag.service';
 import { Item, ItemDocument } from './item.schema';
 import { TagDocument } from '../tag/tag.schema';
-import { CollectionService } from '../collection.service';
+import { CollectionService } from '../collection/collection.service';
 import { FieldValueDocument } from '../field-value/field-value.schema';
 import { RemoveTagDto } from './dto/remove-tag.dto';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { paginationQuery } from 'src/utils';
+import { FieldValueService } from 'src/field-value/field-value.service';
 
 @Injectable()
 export class ItemService {
   constructor(
     @InjectModel(Item.name) private item: Model<ItemDocument>,
     private tagService: TagService,
-    private collectionService: CollectionService,
+    @Inject(forwardRef(() => FieldValueService))
     private fieldValueService: FieldValueService,
+    private collectionService: CollectionService,
   ) {}
 
   async addItem(itemDto: CreateItemDto) {

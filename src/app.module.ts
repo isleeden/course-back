@@ -5,6 +5,11 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { CollectionModule } from './collection/collection.module';
+import { CommentModule } from './comment/comment.module';
+import { FieldModule } from './field/field.module';
+import { FieldValueModule } from './field-value/field-value.module';
+import { ItemModule } from './item/item.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -14,6 +19,8 @@ import { CollectionModule } from './collection/collection.module';
     AuthModule,
     AdminModule,
     CollectionModule,
+    ItemModule,
+    TagModule,
   ],
   controllers: [],
   providers: [],

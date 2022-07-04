@@ -1,4 +1,4 @@
-import { Item } from 'src/collection/item/item.schema';
+import { Item } from 'src/item/item.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';

@@ -1,10 +1,5 @@
-import { ItemService } from './../item/item.service';
-import {
-  BadRequestException,
-  forwardRef,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { ItemService } from '../item/item.service';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import FieldTypes from 'src/types/field-types';

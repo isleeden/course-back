@@ -1,6 +1,5 @@
-import { FieldDocument } from './field/field.schema';
-import { getByUserIdPaginationData } from '../types/get-data.dto';
-import { FieldService } from './field/field.service';
+import { FieldDocument } from '../field/field.schema';
+import { FieldService } from '../field/field.service';
 import { UsersService } from 'src/users/users.service';
 import {
   CollectionField,
@@ -12,9 +11,8 @@ import { Collection, CollectionDocument } from './collection.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { getPaginationData } from 'src/types/get-data.dto';
-import { ItemDocument } from './item/item.schema';
+import { ItemDocument } from '../item/item.schema';
 import { aggregateByLength, paginationQuery } from 'src/utils';
-import { MostItemsDto } from './item/dto/most-items.dto';
 
 @Injectable()
 export class CollectionService {
