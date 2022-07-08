@@ -1,3 +1,4 @@
+import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import {
   CanActivate,
@@ -11,17 +12,19 @@ import { getHeaders } from 'src/utils';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private usersService: UsersService,
+  ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     try {
       const token = getHeaders(req);
-      const user = this.jwtService.verify(token);
-      if (user.blocked) throw new ForbiddenException();
-      req.user = user
+      const userToken = this.jwtService.verify(token);
+      const user = await this.usersService.findById(userToken.id);
+      if (user.blocked || !user) throw new ForbiddenException();
+      req.user = userToken;
       return true;
     } catch (e) {
       throw new UnauthorizedException();

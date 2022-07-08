@@ -8,6 +8,7 @@ import { ItemController } from './item.controller';
 import { ItemService } from './item.service';
 import { CommentModule } from 'src/comment/comment.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from 'src/auth/auth.module';
     TagModule,
     forwardRef(() => CollectionModule),
     forwardRef(() => CommentModule),
+    forwardRef(() => UsersModule),
     AuthModule,
   ],
   controllers: [ItemController],

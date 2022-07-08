@@ -1,3 +1,4 @@
+import { UsersModule } from 'src/users/users.module';
 import { ItemModule } from './../item/item.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { forwardRef, Module } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
     AuthModule,
+    forwardRef(() => UsersModule),
     forwardRef(() => ItemModule),
   ],
   controllers: [CommentController],
