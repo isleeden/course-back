@@ -15,10 +15,10 @@ export class Collection {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   description: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user: User;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Field' }] })

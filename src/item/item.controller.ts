@@ -1,18 +1,20 @@
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { CreateItemDto } from './dto/create-item.dto';
-import { RemoveTagDto } from './dto/remove-tag.dto';
 import { ItemService } from './item.service';
+import { ItemGuard } from './item.auth.guard';
 
 @Controller('item')
 export class ItemController {
@@ -28,21 +30,19 @@ export class ItemController {
     return this.itemService.findItem(params.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  addItem(@Body() itemDto: CreateItemDto) {
-    return this.itemService.addItem(itemDto);
+  addItem(@Body() itemDto: CreateItemDto, @Req() request) {
+    return this.itemService.addItem(itemDto, request);
   }
 
+  @UseGuards(ItemGuard)
   @Put('/:id')
   updateItem(@Param() params, @Body() itemDto: CreateItemDto) {
     return this.itemService.update(params.id, itemDto);
   }
 
-  @Patch('/remove_tag')
-  removeTag(@Body() removeTagDto: RemoveTagDto) {
-    return this.itemService.removeTag(removeTagDto);
-  }
-
+  @UseGuards(ItemGuard)
   @Delete(':id')
   removeItem(@Param() params) {
     return this.itemService.remove(params.id);

@@ -46,6 +46,12 @@ export class AuthService {
     }
   }
 
+  async verifyUser(user_id: string) {
+    const user = await this.usersService.findById(user_id);
+    if (!user || user.blocked) throw new ForbiddenException();
+    return user.role === Roles.Admin;
+  }
+
   private async validateUser(userDto: CreateUserDto) {
     const user = await this.usersService.findByName(userDto.name);
     if (!user) throw new BadRequestException();

@@ -1,3 +1,4 @@
+import { TagSchema } from './../tag/tag.schema';
 import { FieldValue } from '../field-value/field-value.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
@@ -12,7 +13,11 @@ export class Item {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Collection' })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Collection',
+    required: true,
+  })
   _collection: Collection;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }] })
@@ -27,4 +32,8 @@ export class Item {
   tags: Tag[];
 }
 
-export const ItemSchema = SchemaFactory.createForClass(Item);
+const ItemSchema = SchemaFactory.createForClass(Item);
+
+ItemSchema.index({ '$**': 'text' });
+
+export { ItemSchema };

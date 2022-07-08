@@ -1,5 +1,5 @@
 import { getPaginationData } from 'src/types/get-data.dto';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { Model } from 'mongoose';
 
@@ -32,8 +32,7 @@ export async function aggregateByLength<T>(
   model: Model<T>,
   options: {
     query: getPaginationData;
-    sortBy: 1 | -1 | 'asc' | 'desc' | 'ascending' | 'descending';
-    sortField: string;
+    lengthField: string;
   },
 ) {
   const { query } = options;
@@ -41,8 +40,8 @@ export async function aggregateByLength<T>(
   const results = model
     .aggregate()
     .match(where)
-    .addFields({ length: { $size: options.sortField } })
-    .sort({ ...JSON.parse(query.sort), length: options.sortBy })
+    .addFields({ length: { $size: options.lengthField } })
+    .sort(JSON.parse(query.sort))
     .skip(Number(query.offset))
     .limit(Number(query.limit));
   const count = await model.where(where).count();

@@ -35,4 +35,8 @@ export class FieldService {
   async findById(id: string) {
     return await this.field.findById(id);
   }
+
+  async deleteMany(where: object) {
+    return await this.field.deleteMany(where);
+  }
 }

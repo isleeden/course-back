@@ -1,4 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { CreateCommentDto } from './dto/create-comment-dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { getPaginationData } from 'src/types/get-data.dto';
 import { CommentService } from './comment.service';
 
 @Controller('comments')
@@ -6,7 +19,19 @@ export class CommentController {
   constructor(private commentService: CommentService) {}
 
   @Get()
-  getComments() {
-    this.commentService.findComments();
+  getComments(@Query() query: getPaginationData) {
+    return this.commentService.findComments(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  createComment(@Body() commentDto: CreateCommentDto, @Req() request) {
+    return this.commentService.createComment(commentDto, request);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  removeComment(@Param() params, @Req() request) {
+    return this.commentService.remove(params.id, request);
   }
 }

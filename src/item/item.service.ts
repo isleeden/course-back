@@ -1,6 +1,14 @@
+import { CommentDocument } from './../comment/comment.schema';
+import { CollectionDocument } from 'src/collection/collection.schema';
+import { CommentService } from './../comment/comment.service';
 import { CreateFieldValueDto } from '../field-value/dto/create-field-value.dto';
 import { CreateItemDto } from './dto/create-item.dto';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  forwardRef,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TagService } from 'src/tag/tag.service';
@@ -8,10 +16,11 @@ import { Item, ItemDocument } from './item.schema';
 import { TagDocument } from '../tag/tag.schema';
 import { CollectionService } from '../collection/collection.service';
 import { FieldValueDocument } from '../field-value/field-value.schema';
-import { RemoveTagDto } from './dto/remove-tag.dto';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { paginationQuery } from 'src/utils';
 import { FieldValueService } from 'src/field-value/field-value.service';
+import { UserDocument } from 'src/users/users.schema';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class ItemService {
@@ -20,10 +29,16 @@ export class ItemService {
     private tagService: TagService,
     @Inject(forwardRef(() => FieldValueService))
     private fieldValueService: FieldValueService,
+    @Inject(forwardRef(() => CollectionService))
     private collectionService: CollectionService,
+    @Inject(forwardRef(() => CommentService))
+    private commentService: CommentService,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
   ) {}
 
-  async addItem(itemDto: CreateItemDto) {
+  async addItem(itemDto: CreateItemDto, request) {
+    await this.collectionService.verify(request.user.id, itemDto.collection_id);
     const createdItem = await this.item.create({
       name: itemDto.name,
       _collection: itemDto.collection_id,
@@ -38,6 +53,8 @@ export class ItemService {
   }
 
   async update(id: string, itemDto: CreateItemDto) {
+    const item = await this.item.findById(id);
+    this.unbindTags(item);
     const updatedItem = await this.item.findByIdAndUpdate(id, {
       name: itemDto.name,
       _collection: itemDto.collection_id,
@@ -50,7 +67,13 @@ export class ItemService {
   }
 
   async remove(id: string) {
-    return await this.item.findByIdAndDelete(id);
+    const item = await this.item.findById(id);
+    this.unbindTags(item);
+    const collection = item._collection as CollectionDocument;
+    this.collectionService.unbindItem(item, collection._id);
+    this.commentService.deleteMany({ item: id });
+    this.fieldValueService.deleteMany({ item: id });
+    return await item.delete();
   }
 
   async findById(id: string) {
@@ -65,10 +88,12 @@ export class ItemService {
     );
   }
 
-  async removeTag(removeTagDto: RemoveTagDto) {
-    return await this.item.findByIdAndUpdate(removeTagDto.id, {
-      $pull: { tags: removeTagDto.tag_id },
-    });
+  async addComment(itemId: string, comment: CommentDocument) {
+    return await this.item.findByIdAndUpdate(
+      itemId,
+      { $push: { comments: comment._id } },
+      { new: true, useFindAndModify: false },
+    );
   }
 
   async addTagToItem(tag: TagDocument, item: ItemDocument) {
@@ -116,6 +141,12 @@ export class ItemService {
     }
   }
 
+  private unbindTags(item: ItemDocument) {
+    for (const tag of item.tags as TagDocument[]) {
+      this.tagService.unbindItem(item, tag._id);
+    }
+  }
+
   private getUniqueTags(tags: string[]) {
     const uniqueTags = [];
     tags.forEach((element) => {
@@ -124,5 +155,17 @@ export class ItemService {
       }
     });
     return uniqueTags;
+  }
+
+  async verify(user_id: string, item_id: string) {
+    if (await this.authService.verifyUser(user_id)) return true;
+    const item = await this.item.findById(item_id).populate({
+      path: '_collection',
+      populate: [{ path: 'fields' }, { path: 'user' }],
+    });
+    console.log(this.item.findById(item_id));
+    const author = item._collection.user as UserDocument;
+    if (author._id !== user_id) throw new ForbiddenException();
+    return true;
   }
 }

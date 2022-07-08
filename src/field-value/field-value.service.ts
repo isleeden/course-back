@@ -1,5 +1,10 @@
 import { ItemService } from '../item/item.service';
-import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import FieldTypes from 'src/types/field-types';
@@ -41,6 +46,10 @@ export class FieldValueService {
         field: fieldValueDto.field_id,
       }))
     );
+  }
+
+  async deleteMany(where: object) {
+    return await this.fieldValueModel.deleteMany(where);
   }
 
   private async bindValue(

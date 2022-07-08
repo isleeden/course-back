@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import {
   Body,
   Controller,
@@ -16,13 +17,12 @@ import {
   CreateCollectionDto,
   EditCollectionDto,
 } from './dto/create-collection.dto';
-import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('collection')
 export class CollectionController {
   constructor(private collectionService: CollectionService) {}
 
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   createCollection(@Body() collectionDto: CreateCollectionDto, @Req() request) {
     return this.collectionService.createCollection(collectionDto, request);
@@ -38,9 +38,14 @@ export class CollectionController {
     return this.collectionService.findMostItems(query);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
-  editCollection(@Param() params, @Body() collectionDto: EditCollectionDto) {
-    return this.collectionService.update(params.id, collectionDto);
+  editCollection(
+    @Param() params,
+    @Body() collectionDto: EditCollectionDto,
+    @Req() request,
+  ) {
+    return this.collectionService.update(params.id, collectionDto, request);
   }
 
   @Get(':id')
@@ -48,8 +53,9 @@ export class CollectionController {
     return this.collectionService.findById(params.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  removeCollections(@Param() params) {
-    return this.collectionService.remove(params.id);
+  removeCollections(@Param() params, @Req() request) {
+    return this.collectionService.remove(params.id, request);
   }
 }

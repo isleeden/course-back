@@ -14,8 +14,7 @@ export class TagService {
   async findTags(query: getPaginationData) {
     const { results, count } = await aggregateByLength<Tag>(this.tag, {
       query,
-      sortBy: -1,
-      sortField: '$items',
+      lengthField: '$items',
     });
     return { results: await results.exec(), count };
   }
@@ -42,6 +41,14 @@ export class TagService {
       tag_id,
       { $push: { items: item._id } },
       { new: true, useFindAndModify: false },
+    );
+  }
+
+  async unbindItem(item: ItemDocument, tag_id: string) {
+    return await this.tag.findByIdAndUpdate(
+      tag_id,
+      { $pull: { items: item._id } },
+      { multi: true },
     );
   }
 }

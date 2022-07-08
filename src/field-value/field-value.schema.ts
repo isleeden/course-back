@@ -11,10 +11,10 @@ export class FieldValue {
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
   value: any;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Item' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: true })
   item: Item;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Field' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Field', required: true })
   field: Field;
 }
 

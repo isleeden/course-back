@@ -6,13 +6,17 @@ import { forwardRef, Module } from '@nestjs/common';
 import { Item, ItemSchema } from './item.schema';
 import { ItemController } from './item.controller';
 import { ItemService } from './item.service';
+import { CommentModule } from 'src/comment/comment.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Item.name, schema: ItemSchema }]),
     forwardRef(() => FieldValueModule),
     TagModule,
-    CollectionModule,
+    forwardRef(() => CollectionModule),
+    forwardRef(() => CommentModule),
+    AuthModule,
   ],
   controllers: [ItemController],
   providers: [ItemService],

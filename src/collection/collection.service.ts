@@ -1,3 +1,5 @@
+import { AuthService } from './../auth/auth.service';
+import { UserDocument } from './../users/users.schema';
 import { FieldDocument } from '../field/field.schema';
 import { FieldService } from '../field/field.service';
 import { UsersService } from 'src/users/users.service';
@@ -6,20 +8,32 @@ import {
   CreateCollectionDto,
   EditCollectionDto,
 } from './dto/create-collection.dto';
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Collection, CollectionDocument } from './collection.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { ItemDocument } from '../item/item.schema';
 import { aggregateByLength, paginationQuery } from 'src/utils';
+import { ItemService } from 'src/item/item.service';
+import Roles from 'src/types/roles';
 
 @Injectable()
 export class CollectionService {
   constructor(
     @InjectModel(Collection.name) private collection: Model<CollectionDocument>,
+    @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
+    @Inject(forwardRef(() => FieldService))
     private fieldService: FieldService,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
+    private itemService: ItemService,
   ) {}
 
   async createCollection(collectionDto: CreateCollectionDto, request) {
@@ -58,8 +72,7 @@ export class CollectionService {
   async findMostItems(query: getPaginationData) {
     const { results } = await aggregateByLength<Collection>(this.collection, {
       query,
-      sortBy: -1,
-      sortField: '$items',
+      lengthField: '$items',
     });
     return await results
       .lookup({
@@ -71,7 +84,9 @@ export class CollectionService {
       .unwind({ path: '$user', preserveNullAndEmptyArrays: true });
   }
 
-  async update(id: string, collectionDto: EditCollectionDto) {
+  async update(id: string, collectionDto: EditCollectionDto, request) {
+    const userId = request.user.id;
+    await this.verify(userId, id);
     const createdCollection = await this.collection.findByIdAndUpdate(id, {
       name: collectionDto.name,
       description: collectionDto.description,
@@ -92,8 +107,17 @@ export class CollectionService {
       .populate('user');
   }
 
-  async remove(id: string) {
-    return await this.collection.findByIdAndDelete(id);
+  async remove(id: string, request) {
+    const userId = request.user.id;
+    await this.verify(userId, id);
+    const collection = await this.collection.findById(id);
+    for (const item of collection.items as ItemDocument[]) {
+      await this.itemService.remove(item._id);
+    }
+    this.fieldService.deleteMany({ collection: id });
+    const user = collection.user as UserDocument;
+    this.userService.unbindCollection(collection, user._id);
+    return await collection.delete();
   }
 
   private async addFieldsToCollection(
@@ -133,5 +157,22 @@ export class CollectionService {
       type: field.type,
       name: field.name,
     });
+  }
+
+  async unbindItem(item: ItemDocument, collection_id: string) {
+    return await this.collection.findByIdAndUpdate(
+      collection_id,
+      { $pull: { items: item._id } },
+      { multi: true },
+    );
+  }
+
+  async verify(user_id: string, collection_id: string) {
+    if (await this.authService.verifyUser(user_id)) return true;
+    const collection = await this.collection
+      .findById(collection_id)
+      .populate('user');
+    const author = collection.user as UserDocument;
+    if (author._id.toString() !== user_id) throw new ForbiddenException();
   }
 }
