@@ -1,3 +1,4 @@
+import { CommentDocument } from './../comment/comment.schema';
 import { paginationQuery } from 'src/utils';
 import { UserDocument } from './users.schema';
 import {
@@ -16,6 +17,7 @@ import { hash, compare } from 'bcrypt';
 import { CollectionDocument } from 'src/collection/collection.schema';
 import { CollectionService } from 'src/collection/collection.service';
 import { AuthService } from 'src/auth/auth.service';
+import { CommentService } from 'src/comment/comment.service';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +27,7 @@ export class UsersService {
     private collectionService: CollectionService,
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
+    private commentService: CommentService,
   ) {}
 
   async create(userDto: CreateUserDto): Promise<UserDocument> {
@@ -44,12 +47,12 @@ export class UsersService {
     return await this.user.findByIdAndUpdate(id, update);
   }
 
-  async remove(id: string, request) {
-    await this.verify(request.user.id, id);
+  async remove(id: string) {
     const user = await this.user.findById(id);
     for (const collection of user.collections as CollectionDocument[]) {
-      await this.collectionService.remove(collection._id, request);
+      await this.collectionService.remove(collection._id);
     }
+    await this.commentService.deleteMany({ user: user._id });
     return await user.delete();
   }
 
@@ -73,6 +76,14 @@ export class UsersService {
     );
   }
 
+  async findAndAddComment(userId: string, comment: CommentDocument) {
+    return await this.user.findByIdAndUpdate(
+      userId,
+      { $push: { comments: comment._id } },
+      { new: true, useFindAndModify: false },
+    );
+  }
+
   async comparePasswords(
     password: string,
     hashedPassword: string,
@@ -88,9 +99,9 @@ export class UsersService {
     return { results, count };
   }
 
-  private async verify(user_id: string, action_user_id: string) {
+  async verify(user_id: string, action_user_id: string) {
     if (await this.authService.verifyUser(user_id)) return true;
     const user = await this.user.findById(action_user_id);
-    if (user._id !== user_id) throw new ForbiddenException();
+    if (user._id.toString() !== user_id) throw new ForbiddenException();
   }
 }

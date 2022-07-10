@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { CommentService } from './comment.service';
+import { CommentGuard } from './comment.guard';
 
 @Controller('comments')
 export class CommentController {
@@ -29,9 +30,9 @@ export class CommentController {
     return this.commentService.createComment(commentDto, request);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  removeComment(@Param() params, @Req() request) {
-    return this.commentService.remove(params.id, request);
+  @UseGuards(CommentGuard)
+  @Delete('/:id')
+  removeComment(@Param('id') id: string) {
+    return this.commentService.remove(id);
   }
 }

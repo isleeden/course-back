@@ -17,10 +17,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async registration(userDto: CreateUserDto, isAdmin = false) {
+  async registration(userDto: CreateUserDto) {
     await this.isCandidateExist(userDto.name);
     const hashPassword = await this.usersService.hashPassword(userDto.password);
-    if (isAdmin) userDto.role = Roles.Admin;
     const user = await this.usersService.create({
       ...userDto,
       password: hashPassword,

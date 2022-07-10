@@ -163,9 +163,8 @@ export class ItemService {
       path: '_collection',
       populate: [{ path: 'fields' }, { path: 'user' }],
     });
-    console.log(this.item.findById(item_id));
     const author = item._collection.user as UserDocument;
-    if (author._id !== user_id) throw new ForbiddenException();
+    if (author._id.toString() !== user_id) throw new ForbiddenException();
     return true;
   }
 }

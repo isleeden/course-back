@@ -5,27 +5,25 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from './roles.decorator';
 import { getHeaders } from 'src/utils';
+import Roles from 'src/types/roles';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
-
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  constructor(
+    private jwtService: JwtService,
+    private usersService: UsersService,
+  ) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     try {
       const token = getHeaders(req);
-      const user = this.jwtService.verify(token);
-      const requiredRole = this.reflector.get(ROLES_KEY, context.getHandler());
-      if (user.blocked) throw new ForbiddenException();
-      req.user = user;
-      if (!requiredRole && requiredRole !== '') return true;
-      return user.role == requiredRole;
+      const userToken = this.jwtService.verify(token);
+      const user = await this.usersService.findById(userToken.id);
+      if (user.blocked || !user) throw new ForbiddenException();
+      req.user = userToken;
+      return user.role == Roles.Admin;
     } catch (e) {
       throw new ForbiddenException();
     }

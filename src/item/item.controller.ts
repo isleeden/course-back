@@ -26,8 +26,8 @@ export class ItemController {
   }
 
   @Get('/:id')
-  getItem(@Param() params) {
-    return this.itemService.findItem(params.id);
+  getItem(@Param('id') id: string) {
+    return this.itemService.findItem(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -38,13 +38,13 @@ export class ItemController {
 
   @UseGuards(ItemGuard)
   @Put('/:id')
-  updateItem(@Param() params, @Body() itemDto: CreateItemDto) {
-    return this.itemService.update(params.id, itemDto);
+  updateItem(@Param('id') id: string, @Body() itemDto: CreateItemDto) {
+    return this.itemService.update(id, itemDto);
   }
 
   @UseGuards(ItemGuard)
   @Delete(':id')
-  removeItem(@Param() params) {
-    return this.itemService.remove(params.id);
+  removeItem(@Param('id') id: string) {
+    return this.itemService.remove(id);
   }
 }

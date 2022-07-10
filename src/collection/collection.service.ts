@@ -84,9 +84,7 @@ export class CollectionService {
       .unwind({ path: '$user', preserveNullAndEmptyArrays: true });
   }
 
-  async update(id: string, collectionDto: EditCollectionDto, request) {
-    const userId = request.user.id;
-    await this.verify(userId, id);
+  async update(id: string, collectionDto: EditCollectionDto) {
     const createdCollection = await this.collection.findByIdAndUpdate(id, {
       name: collectionDto.name,
       description: collectionDto.description,
@@ -107,9 +105,7 @@ export class CollectionService {
       .populate('user');
   }
 
-  async remove(id: string, request) {
-    const userId = request.user.id;
-    await this.verify(userId, id);
+  async remove(id: string) {
     const collection = await this.collection.findById(id);
     for (const item of collection.items as ItemDocument[]) {
       await this.itemService.remove(item._id);
@@ -174,5 +170,6 @@ export class CollectionService {
       .populate('user');
     const author = collection.user as UserDocument;
     if (author._id.toString() !== user_id) throw new ForbiddenException();
+    return true;
   }
 }

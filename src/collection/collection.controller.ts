@@ -17,6 +17,7 @@ import {
   CreateCollectionDto,
   EditCollectionDto,
 } from './dto/create-collection.dto';
+import { CollectionGuard } from './collection.guard';
 
 @Controller('collection')
 export class CollectionController {
@@ -38,24 +39,24 @@ export class CollectionController {
     return this.collectionService.findMostItems(query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CollectionGuard)
   @Put(':id')
   editCollection(
-    @Param() params,
+    @Param('id') id: string,
     @Body() collectionDto: EditCollectionDto,
-    @Req() request,
   ) {
-    return this.collectionService.update(params.id, collectionDto, request);
+    return this.collectionService.update(id, collectionDto);
   }
 
   @Get(':id')
-  getCollection(@Param() params) {
-    return this.collectionService.findById(params.id);
+  getCollection(@Param('id') id: string) {
+    return this.collectionService.findById(id);
   }
 
+  @UseGuards(CollectionGuard)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  removeCollections(@Param() params, @Req() request) {
-    return this.collectionService.remove(params.id, request);
+  removeCollections(@Param('id') id: string) {
+    return this.collectionService.remove(id);
   }
 }

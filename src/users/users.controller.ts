@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { getPaginationData } from 'src/types/get-data.dto';
 import { UsersService } from './users.service';
+import { UsersGuard } from './users.guard';
 
 @Controller('users')
 export class UsersController {
@@ -21,13 +22,13 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findOne(@Param() params) {
-    return this.usersService.findById(params.id);
+  findOne(@Param('id') id: string) {
+    return this.usersService.findById(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UsersGuard)
   @Delete('/:id')
-  remove(@Param() params, @Req() request) {
-    return this.usersService.remove(params.id, request);
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }
