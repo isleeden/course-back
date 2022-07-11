@@ -9,7 +9,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { getPaginationData } from 'src/types/get-data.dto';
-import { aggregateByLength } from 'src/utils';
+import { aggregateByLength, paginationQuery } from 'src/utils';
 import { CommentDocument } from './comment.schema';
 import { ItemService } from 'src/item/item.service';
 import { AuthService } from 'src/auth/auth.service';
@@ -29,19 +29,11 @@ export class CommentService {
   ) {}
 
   async findComments(query: getPaginationData) {
-    const { results, count } = await aggregateByLength<Comment>(this.comment, {
+    const { findQuery, count } = await paginationQuery<Comment>(this.comment, {
       query,
-      lengthField: '$likes',
     });
-    const result = await results
-      .lookup({
-        from: 'users',
-        localField: 'user',
-        foreignField: '_id',
-        as: 'user',
-      })
-      .unwind({ path: '$user', preserveNullAndEmptyArrays: true });
-    return { results: result, count };
+    const results = await findQuery.populate('user');
+    return { results, count };
   }
 
   async createComment(commentDto: CreateCommentDto, request) {
